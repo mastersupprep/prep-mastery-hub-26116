@@ -92,6 +92,10 @@ export function useTestData() {
           partial_marks: q.partial_marks,
           time_minutes: q.time_minutes,
           part: q.part,
+          diagram_json: q.diagram_json,
+          options_diagrams: q.options_diagrams,
+          answer_diagram: q.answer_diagram,
+          solution_diagram: q.solution_diagram,
         });
       });
       setChapterQuestions(chapterQuestionsMap);
@@ -121,6 +125,10 @@ export function useTestData() {
           partial_marks: q.partial_marks,
           time_minutes: q.time_minutes,
           part: q.part,
+          diagram_json: q.diagram_json,
+          options_diagrams: q.options_diagrams,
+          answer_diagram: q.answer_diagram,
+          solution_diagram: q.solution_diagram,
         });
       });
 
@@ -169,6 +177,10 @@ export function useTestData() {
           partial_marks: q.partial_marks,
           time_minutes: q.time_minutes,
           part: q.part,
+          diagram_json: q.diagram_json,
+          options_diagrams: q.options_diagrams,
+          answer_diagram: q.answer_diagram,
+          solution_diagram: q.solution_diagram,
         });
       });
 
