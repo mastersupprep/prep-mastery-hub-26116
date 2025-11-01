@@ -7,7 +7,7 @@ interface DiagramRendererProps {
 
 export function DiagramRenderer({ diagramData, className = '' }: DiagramRendererProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 440 });
+//  const [dimensions, setDimensions] = useState({ width: 600, height: 440 });
 
   useEffect(() => {
     console.log('DiagramRenderer received data:', diagramData);
@@ -81,7 +81,7 @@ export function DiagramRenderer({ diagramData, className = '' }: DiagramRenderer
     canvas.style.width = `${finalWidth}px`;
     canvas.style.height = `${finalHeight}px`;
     
-    setDimensions({ width: finalWidth, height: finalHeight });
+  //  setDimensions({ width: finalWidth, height: finalHeight });
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -178,8 +178,8 @@ export function DiagramRenderer({ diagramData, className = '' }: DiagramRenderer
       <div className="bg-white border-2 border-border rounded-lg p-4 shadow-sm">
         <canvas
           ref={canvasRef}
-          width={dimensions.width}
-          height={dimensions.height}
+          width={600} // Use the initial size or remove, as it's set in useEffect
+          height={440} // Use the initial size or remove, as it's set in useEffect
           className="max-w-full h-auto"
         />
       </div>
