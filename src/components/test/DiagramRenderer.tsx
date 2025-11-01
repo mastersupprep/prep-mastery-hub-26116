@@ -10,11 +10,21 @@ export function DiagramRenderer({ diagramData, className = '' }: DiagramRenderer
   const [dimensions, setDimensions] = useState({ width: 600, height: 440 });
 
   useEffect(() => {
-    if (!canvasRef.current || !diagramData || !Array.isArray(diagramData)) return;
+    console.log('DiagramRenderer received data:', diagramData);
+    console.log('Is array?', Array.isArray(diagramData));
+    console.log('Canvas ref exists?', !!canvasRef.current);
+    
+    if (!canvasRef.current || !diagramData || !Array.isArray(diagramData)) {
+      console.log('Early return from DiagramRenderer');
+      return;
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('No canvas context');
+      return;
+    }
 
     console.log('Rendering diagram with data:', diagramData);
 
