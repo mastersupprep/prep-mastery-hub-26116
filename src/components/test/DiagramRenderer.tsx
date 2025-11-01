@@ -31,28 +31,39 @@ export function DiagramRenderer({ diagramData, className = '' }: DiagramRenderer
     // Calculate bounds
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     diagramData.forEach((element: any) => {
-      if (!element || typeof element.x !== 'number' || typeof element.y !== 'number') return;
+      if (!element) return;
       
-      const x1 = element.x;
-      const y1 = element.y;
-      const x2 = x1 + (element.width || 0);
-      const y2 = y1 + (element.height || 0);
+      const x = element.x || 0;
+      const y = element.y || 0;
+      const width = element.width || 0;
+      const height = element.height || 0;
       
       // For lines, also consider the points
-      if (element.type === 'line' && element.points) {
+      if (element.type === 'line' && Array.isArray(element.points)) {
         element.points.forEach((point: number[]) => {
-          minX = Math.min(minX, x1 + point[0]);
-          minY = Math.min(minY, y1 + point[1]);
-          maxX = Math.max(maxX, x1 + point[0]);
-          maxY = Math.max(maxY, y1 + point[1]);
+          if (Array.isArray(point) && point.length >= 2) {
+            minX = Math.min(minX, x + point[0]);
+            minY = Math.min(minY, y + point[1]);
+            maxX = Math.max(maxX, x + point[0]);
+            maxY = Math.max(maxY, y + point[1]);
+          }
         });
       } else {
-        minX = Math.min(minX, x1);
-        minY = Math.min(minY, y1);
-        maxX = Math.max(maxX, x2);
-        maxY = Math.max(maxY, y2);
+        // For other shapes
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + width);
+        maxY = Math.max(maxY, y + height);
       }
     });
+    
+    // Handle case where no valid coordinates were found
+    if (minX === Infinity || maxX === -Infinity) {
+      console.error('Could not calculate bounds for diagram');
+      return;
+    }
+    
+    console.log('Calculated bounds:', { minX, minY, maxX, maxY });
 
     const padding = 40;
     const contentWidth = maxX - minX + padding * 2;
@@ -84,44 +95,70 @@ export function DiagramRenderer({ diagramData, className = '' }: DiagramRenderer
 
     // Render each element
     diagramData.forEach((element: any) => {
-      if (!element || !element.type) return;
+      if (!element || !element.type) {
+        console.warn('Skipping invalid element:', element);
+        return;
+      }
+
+      const x = element.x || 0;
+      const y = element.y || 0;
+      const width = element.width || 0;
+      const height = element.height || 0;
 
       ctx.strokeStyle = element.strokeColor || '#000000';
-      ctx.fillStyle = element.backgroundColor && element.backgroundColor !== 'transparent' ? element.backgroundColor : 'rgba(0,0,0,0)';
       ctx.lineWidth = element.strokeWidth || 2;
 
       try {
         if (element.type === 'ellipse') {
-          const centerX = element.x + (element.width || 0) / 2;
-          const centerY = element.y + (element.height || 0) / 2;
-          const radiusX = (element.width || 0) / 2;
-          const radiusY = (element.height || 0) / 2;
+          const centerX = x + width / 2;
+          const centerY = y + height / 2;
+          const radiusX = width / 2;
+          const radiusY = height / 2;
 
           ctx.beginPath();
           ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+          
+          // Fill if background color is set
           if (element.backgroundColor && element.backgroundColor !== 'transparent') {
+            ctx.fillStyle = element.backgroundColor;
             ctx.fill();
           }
           ctx.stroke();
+          console.log('Rendered ellipse:', { centerX, centerY, radiusX, radiusY });
         } else if (element.type === 'rectangle') {
           ctx.beginPath();
-          ctx.rect(element.x, element.y, element.width || 0, element.height || 0);
+          ctx.rect(x, y, width, height);
+          
+          // Fill if background color is set
           if (element.backgroundColor && element.backgroundColor !== 'transparent') {
+            ctx.fillStyle = element.backgroundColor;
             ctx.fill();
           }
           ctx.stroke();
-        } else if (element.type === 'line') {
-          const points = element.points || [[0, 0], [(element.width || 0), (element.height || 0)]];
+          console.log('Rendered rectangle:', { x, y, width, height });
+        } else if (element.type === 'line' && Array.isArray(element.points)) {
           ctx.beginPath();
-          ctx.moveTo(element.x + points[0][0], element.y + points[0][1]);
-          for (let i = 1; i < points.length; i++) {
-            ctx.lineTo(element.x + points[i][0], element.y + points[i][1]);
+          const firstPoint = element.points[0];
+          if (firstPoint && Array.isArray(firstPoint) && firstPoint.length >= 2) {
+            ctx.moveTo(x + firstPoint[0], y + firstPoint[1]);
+            for (let i = 1; i < element.points.length; i++) {
+              const point = element.points[i];
+              if (point && Array.isArray(point) && point.length >= 2) {
+                ctx.lineTo(x + point[0], y + point[1]);
+              }
+            }
+            ctx.stroke();
+            console.log('Rendered line with', element.points.length, 'points');
           }
-          ctx.stroke();
         } else if (element.type === 'text') {
           ctx.fillStyle = element.strokeColor || '#000000';
-          ctx.font = `${element.fontSize || 14}px ${element.fontFamily === 1 ? 'Arial' : 'sans-serif'}`;
-          ctx.fillText(element.text || '', element.x, element.y);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = `${element.fontSize || 16}px ${element.fontFamily === 1 ? 'Arial' : 'sans-serif'}`;
+          ctx.fillText(element.text || '', x, y);
+          console.log('Rendered text:', element.text, 'at', x, y);
+        } else {
+          console.warn('Unknown element type:', element.type);
         }
       } catch (error) {
         console.error('Error rendering element:', element, error);
