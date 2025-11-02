@@ -6,6 +6,7 @@ import { Authentication } from "./Authentication";
 import { NameSetup } from "./NameSetup";
 import { ExamSelection } from "./ExamSelection";
 import { CourseSelection } from "./CourseSelection";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,12 +40,13 @@ const Index = () => {
     }
   }, [user, profile, authLoading, profileLoading, navigate]);
 
-  if (currentStep === 'onboarding') {
-    return <Onboarding />;
+  // Show loading screen while checking auth state
+  if (authLoading || profileLoading) {
+    return <LoadingScreen />;
   }
 
-  if (authLoading || profileLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (currentStep === 'onboarding') {
+    return <Onboarding />;
   }
 
   if (currentStep === 'authentication') {

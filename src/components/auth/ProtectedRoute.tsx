@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -12,7 +13,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { profile, loading: profileLoading } = useProfile();
 
   if (authLoading || profileLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (!user) {
