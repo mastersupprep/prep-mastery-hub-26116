@@ -6,11 +6,12 @@ import { Authentication } from "./Authentication";
 import { NameSetup } from "./NameSetup";
 import { ExamSelection } from "./ExamSelection";
 import { CourseSelection } from "./CourseSelection";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 
-type AppStep = 'onboarding' | 'authentication' | 'name-setup' | 'exam-selection' | 'course-selection' | 'dashboard';
+type AppStep = 'onboarding' | 'authentication' | 'name-setup' | 'exam-selection' | 'course-selection';
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<AppStep>('onboarding');
@@ -44,7 +45,7 @@ const Index = () => {
   }
 
   if (authLoading || profileLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (currentStep === 'authentication') {

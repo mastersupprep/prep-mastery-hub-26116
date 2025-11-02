@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,22 +10,9 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authLoading && !profileLoading) {
-      if (!user) {
-        // Not authenticated, redirect to home/onboarding
-        navigate('/', { replace: true });
-      } else if (user && profile && (!profile.selected_exam_id || !profile.selected_course_id)) {
-        // Authenticated but incomplete setup
-        navigate('/', { replace: true });
-      }
-    }
-  }, [user, profile, authLoading, profileLoading, navigate]);
 
   if (authLoading || profileLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (!user) {
