@@ -1,27 +1,25 @@
-import { ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { TopBar } from "@/components/layout/TopBar";
-import { useProfile } from "@/hooks/useProfile";
 
 interface AppLayoutProps {
   children: ReactNode;
   currentPage?: string;
+  userName?: string;
+  userSubscription?: 'freemium' | 'premium';
+  onPageChange?: (page: string) => void;
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
-  const { profile } = useProfile();
-  
+export function AppLayout({ children, currentPage, userName = "User", userSubscription = "freemium", onPageChange }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <AppSidebar userSubscription={profile?.subscription || "freemium"} />
+        <AppSidebar currentPage={currentPage} userSubscription={userSubscription} onPageChange={onPageChange} />
         <div className="flex-1 flex flex-col">
-          <TopBar userName={profile?.name || "User"} />
+          <TopBar userName={userName} />
           <main className="flex-1">
-            <div className="p-6 bg-muted/30">
-              {children}
-            </div>
+            {children}
           </main>
         </div>
       </div>
