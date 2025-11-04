@@ -8,8 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, ChevronLeft, ChevronRight, Flag, Send, Calculator as CalculatorIcon, Trophy, PanelRightOpen, PanelRightClose } from "lucide-react";
-import { LaTeXRenderer } from "./LaTeXRenderer";
-import { DiagramRenderer } from "./DiagramRenderer";
+import { UnifiedContentRenderer } from "./UnifiedContentRenderer";
 import { Calculator } from "@/components/ui/calculator";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -731,15 +730,15 @@ export function TestInterface({ questions, mode, testName, testType = 'practice'
         {/* Question Statement */}
         <Card>
           <CardContent className="pt-6">
-            <LaTeXRenderer 
+            <UnifiedContentRenderer 
               content={currentQuestion.question_statement} 
               className="text-base leading-relaxed"
             />
             
-            {/* Diagram Renderer */}
-            {currentQuestion.diagram_json && (
-              <DiagramRenderer 
-                diagramData={currentQuestion.diagram_json} 
+            {/* Legacy diagram support from diagram_json column */}
+            {currentQuestion.diagram_json && !currentQuestion.question_statement.includes('[{') && (
+              <UnifiedContentRenderer 
+                content={JSON.stringify(currentQuestion.diagram_json)}
                 className="mt-4"
               />
             )}
@@ -760,12 +759,13 @@ export function TestInterface({ questions, mode, testName, testType = 'practice'
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value={option} id={`option-${index}`} />
                       <Label htmlFor={`option-${index}`} className="cursor-pointer">
-                        <LaTeXRenderer content={option} />
+                        <UnifiedContentRenderer content={option} />
                       </Label>
                     </div>
-                    {currentQuestion.options_diagrams?.[index] && (
-                      <DiagramRenderer 
-                        diagramData={currentQuestion.options_diagrams[index]} 
+                    {/* Legacy diagram support from options_diagrams column */}
+                    {currentQuestion.options_diagrams?.[index] && !option.includes('[{') && (
+                      <UnifiedContentRenderer 
+                        content={JSON.stringify(currentQuestion.options_diagrams[index])}
                         className="ml-6"
                       />
                     )}
@@ -792,12 +792,13 @@ export function TestInterface({ questions, mode, testName, testType = 'practice'
                         disabled={mode === 'practice' && showSolution}
                       />
                       <Label htmlFor={`option-${index}`} className="cursor-pointer">
-                        <LaTeXRenderer content={option} />
+                        <UnifiedContentRenderer content={option} />
                       </Label>
                     </div>
-                    {currentQuestion.options_diagrams?.[index] && (
-                      <DiagramRenderer 
-                        diagramData={currentQuestion.options_diagrams[index]} 
+                    {/* Legacy diagram support from options_diagrams column */}
+                    {currentQuestion.options_diagrams?.[index] && !option.includes('[{') && (
+                      <UnifiedContentRenderer 
+                        content={JSON.stringify(currentQuestion.options_diagrams[index])}
                         className="ml-6"
                       />
                     )}
@@ -850,10 +851,11 @@ export function TestInterface({ questions, mode, testName, testType = 'practice'
                   <div>
                     <h4 className="font-semibold mb-2">Correct Answer:</h4>
                     <div className="bg-white p-3 rounded border">
-                      <LaTeXRenderer content={currentQuestion.answer} className="text-sm" />
-                      {currentQuestion.answer_diagram && (
-                        <DiagramRenderer 
-                          diagramData={currentQuestion.answer_diagram} 
+                      <UnifiedContentRenderer content={currentQuestion.answer} className="text-sm" />
+                      {/* Legacy diagram support from answer_diagram column */}
+                      {currentQuestion.answer_diagram && !currentQuestion.answer.includes('[{') && (
+                        <UnifiedContentRenderer 
+                          content={JSON.stringify(currentQuestion.answer_diagram)}
                           className="mt-2"
                         />
                       )}
@@ -862,13 +864,14 @@ export function TestInterface({ questions, mode, testName, testType = 'practice'
                 
                 <div>
                   <h4 className="font-semibold mb-2">Solution:</h4>
-                  <LaTeXRenderer 
+                  <UnifiedContentRenderer 
                     content={currentQuestion.solution} 
                     className="text-sm leading-relaxed"
                   />
-                  {currentQuestion.solution_diagram && (
-                    <DiagramRenderer 
-                      diagramData={currentQuestion.solution_diagram} 
+                  {/* Legacy diagram support from solution_diagram column */}
+                  {currentQuestion.solution_diagram && !currentQuestion.solution.includes('[{') && (
+                    <UnifiedContentRenderer 
+                      content={JSON.stringify(currentQuestion.solution_diagram)}
                       className="mt-4"
                     />
                   )}
